@@ -7,7 +7,9 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Setup
-        run: apt-get install -y ffmpeg
+        run: |
+          apt-get update
+          apt-get install -y ffmpeg
       - uses: actions/checkout@v1
       - name: Prepare
         run: npm ci
