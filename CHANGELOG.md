@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/mooyoul/vuality/compare/v1.1.0...v1.1.1) (2019-09-20)
+
+
+### Bug Fixes
+
+* fix missing scale option ([9e1a20f](https://github.com/mooyoul/vuality/commit/9e1a20f))
+
 # [1.1.0](https://github.com/mooyoul/vuality/compare/v1.0.0...v1.1.0) (2019-09-20)
 
 
