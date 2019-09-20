@@ -1,0 +1,68 @@
+{
+  "name": "vuality",
+  "version": "1.0.0",
+  "description": "Video Quality Assessment Utility for Node.js",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "files": [
+    "index.d.ts",
+    "index.js"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "test": "mocha -r ts-node/register index.spec.ts",
+    "lint": "tslint -c tslint.json index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mooyoul/vuality.git"
+  },
+  "keywords": [
+    "video",
+    "signal",
+    "image",
+    "psnr",
+    "ssim",
+    "image-quality",
+    "video-quality"
+  ],
+  "author": "MooYeol Prescott Lee <mooyoul@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mooyoul/vuality/issues"
+  },
+  "homepage": "https://github.com/mooyoul/vuality#readme",
+  "devDependencies": {
+    "@types/chai": "4.2.3",
+    "@types/mocha": "5.2.7",
+    "@types/node": "8.10.54",
+    "@vingle/commitlint-preset": "1.0.3",
+    "@vingle/semantic-release-config": "1.0.3",
+    "chai": "4.2.0",
+    "husky": "3.0.5",
+    "mocha": "6.2.0",
+    "ts-node": "8.4.1",
+    "tslint": "5.20.0",
+    "typescript": "3.6.3"
+  },
+  "dependencies": {
+    "execa": "^2.0.4",
+    "tempy": "^0.3.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "commitlint": {
+    "extends": [
+      "@vingle/commitlint-preset"
+    ]
+  }
+}
