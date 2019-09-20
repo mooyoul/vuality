@@ -1,6 +1,6 @@
 {
   "name": "vuality",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Video Quality Assessment Utility for Node.js",
   "main": "index.js",
   "types": "index.d.ts",
