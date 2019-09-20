@@ -47,7 +47,7 @@ const ssim = await vuality.ssim("input.mp4", "reference.mp4");
 
 Returns PSNR Stats
 
-If `scale` option is provided, Vuality tries to scale input video as given resolution before computing PSNR.
+If `scale` option is provided, Vuality tries to scale video streams as given resolution before computing PSNR.
 
 ```typescript
 interface Stat {
@@ -79,7 +79,7 @@ Sync version of `vuality.psnr`.
 
 Returns SSIM Stats
 
-If `scale` option is provided, Vuality tries to scale input video as given resolution before computing SSIM.
+If `scale` option is provided, Vuality tries to scale video streams as given resolution before computing SSIM.
 
 ```typescript
 interface Stat {
