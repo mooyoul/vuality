@@ -157,16 +157,12 @@ export class Vuality {
     const outputPath = tempy.file();
 
     const filters: string[] = (() => {
-      const base = [
-        `movie=${reference} [exp]`,
-      ];
-
       return options.scale ? [
-        ...base,
+        `movie=${reference}, scale=${options.scale.width}:${options.scale.height} [exp]`,
         `[0:v] scale=${options.scale.width}:${options.scale.height} [act]`,
         `[exp][act]${type}=${outputPath} [out]`,
       ] : [
-        ...base,
+        `movie=${reference} [exp]`,
         `[exp][0:v]${type}=${outputPath} [out]`,
       ];
     })();
