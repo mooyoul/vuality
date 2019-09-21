@@ -8,66 +8,91 @@ export interface AssessmentOption {
   scale?: { width: number; height: number; };
 }
 
-export interface Stat {
-  avg: number;
-  y: number;
-  u: number;
-  v: number;
-}
-
-export interface PSNRFrameStat {
-  n: number;
-  mse: Stat;
-  psnr: Stat;
-}
-
 export interface PSNRStat {
-  psnr: Stat;
-  mse: Stat;
-  frames: PSNRFrameStat[];
+  avg?: number;
+  y?: number;
+  u?: number;
+  v?: number;
+  r?: number;
+  g?: number;
+  b?: number;
+  a?: number;
 }
 
-export interface SSIMFrameStat {
+export interface PSNRFrame {
   n: number;
-  ssim: Stat;
+  mse: PSNRStat;
+  psnr: PSNRStat;
+}
+
+export interface PSNR {
+  psnr: PSNRStat;
+  mse: PSNRStat;
+  frames: PSNRFrame[];
 }
 
 export interface SSIMStat {
-  ssim: Stat;
-  frames: SSIMFrameStat[];
+  all?: number;
+  y?: number;
+  u?: number;
+  v?: number;
+  r?: number;
+  g?: number;
+  b?: number;
 }
+
+export interface SSIMFrame {
+  n: number;
+  ssim: SSIMStat;
+}
+
+export interface SSIM {
+  ssim: SSIMStat;
+  frames: SSIMFrame[];
+}
+
+type PSNRStatKey = keyof PSNRStat;
+type SSIMStatKey = keyof SSIMStat;
 
 const parseNumber = (str: string): number => str === "inf" ? Infinity : Number(str);
 
 export class Vuality {
   public constructor(private readonly ffmpegPath: string = "ffmpeg") {}
 
-  public async psnr(input: Input, reference: string, options: AssessmentOption = {}): Promise<PSNRStat> {
+  public async psnr(input: Input, reference: string, options: AssessmentOption = {}): Promise<PSNR> {
     const res = await this.exec("psnr", input, reference, options);
 
     return this.parsePSNRStat(res);
   }
 
-  public psnrSync(input: Input, reference: string, options: AssessmentOption = {}): PSNRStat {
+  public psnrSync(input: Input, reference: string, options: AssessmentOption = {}): PSNR {
     const res = this.execSync("psnr", input, reference, options);
 
     return this.parsePSNRStat(res);
   }
 
-  public async ssim(input: Input, reference: string, options: AssessmentOption = {}): Promise<SSIMStat> {
+  public async ssim(input: Input, reference: string, options: AssessmentOption = {}): Promise<SSIM> {
     const res = await this.exec("ssim", input, reference, options);
 
     return this.parseSSIMStat(res);
   }
 
-  public ssimSync(input: Input, reference: string, options: AssessmentOption = {}): SSIMStat {
+  public ssimSync(input: Input, reference: string, options: AssessmentOption = {}): SSIM {
     const res = this.execSync("ssim", input, reference, options);
 
     return this.parseSSIMStat(res);
   }
 
-  private parsePSNRStat(content: string): PSNRStat {
-    const frames: PSNRFrameStat[] = content.trim().split("\n")
+  private parsePSNRStat(content: string): PSNR {
+    const extract = (dict: { [key: string]: string }, prefix: string) =>
+      Object.keys(dict)
+        .filter((k) => k.startsWith(prefix))
+        .reduce((hash, k) => {
+          hash[k.replace(prefix, "") as PSNRStatKey] = parseNumber(dict[k]);
+          return hash;
+        }, {} as PSNRStat);
+
+    const frames: PSNRFrame[] = content.trim().split("\n")
       .map((row) => {
         const tokens = row.trim().split(/\s+/);
 
@@ -84,39 +109,58 @@ export class Vuality {
 
         return {
           n: parseNumber(dict.n),
-          mse: {
-            avg: parseNumber(dict.mse_avg),
-            y: parseNumber(dict.mse_y),
-            u: parseNumber(dict.mse_u),
-            v: parseNumber(dict.mse_v),
-          },
-          psnr: {
-            avg: parseNumber(dict.psnr_avg),
-            y: parseNumber(dict.psnr_y),
-            u: parseNumber(dict.psnr_u),
-            v: parseNumber(dict.psnr_v),
-          },
+          mse: extract(dict, "mse_"),
+          psnr: extract(dict, "psnr_"),
         };
       });
 
+    const summary = (() => {
+      const mse = {} as PSNRStat;
+      const psnr = {} as PSNRStat;
+
+      for (const frame of frames) {
+        for (const k of Object.keys(frame.mse)) {
+          const key = k as PSNRStatKey;
+          mse[key] = (mse[key] || 0) + frame.mse[key]!;
+        }
+        for (const k of Object.keys(frame.psnr)) {
+          const key = k as PSNRStatKey;
+          psnr[key] = (psnr[key] || 0) + frame.psnr[key]!;
+        }
+      }
+
+      return {
+        mse: Object.keys(mse).reduce((hash, k) => {
+          const key = k as PSNRStatKey;
+          hash[key] = mse[key]! / frames.length;
+
+          return hash;
+        }, {} as PSNRStat),
+        psnr: Object.keys(psnr).reduce((hash, k) => {
+          const key = k as PSNRStatKey;
+          hash[key] = psnr[key]! / frames.length;
+
+          return hash;
+        }, {} as PSNRStat),
+      };
+    })();
+
     return {
-      psnr: {
-        avg: frames.reduce((acc, frame) => acc + frame.psnr.avg, 0) / frames.length,
-        y: frames.reduce((acc, frame) => acc + frame.psnr.y, 0) / frames.length,
-        u: frames.reduce((acc, frame) => acc + frame.psnr.u, 0) / frames.length,
-        v: frames.reduce((acc, frame) => acc + frame.psnr.v, 0) / frames.length,
-      },
-      mse: {
-        avg: frames.reduce((acc, frame) => acc + frame.mse.avg, 0) / frames.length,
-        y: frames.reduce((acc, frame) => acc + frame.mse.y, 0) / frames.length,
-        u: frames.reduce((acc, frame) => acc + frame.mse.u, 0) / frames.length,
-        v: frames.reduce((acc, frame) => acc + frame.mse.v, 0) / frames.length,
-      },
+      psnr: summary.psnr,
+      mse: summary.mse,
       frames,
     };
   }
-  private parseSSIMStat(content: string): SSIMStat {
-    const frames: SSIMFrameStat[] = content.trim().split("\n")
+  private parseSSIMStat(content: string): SSIM {
+    const extract = (dict: { [key: string]: string }) =>
+      Object.keys(dict)
+        .filter((k) => k !== "n")
+        .reduce((hash, k) => {
+          hash[k as SSIMStatKey] = parseNumber(dict[k]);
+          return hash;
+        }, {} as SSIMStat);
+
+    const frames: SSIMFrame[] = content.trim().split("\n")
       .map((row) => {
         const tokens = row.trim().split(/\s+/);
 
@@ -133,22 +177,32 @@ export class Vuality {
 
         return {
           n: parseNumber(dict.n),
-          ssim: {
-            avg: parseNumber(dict.all),
-            y: parseNumber(dict.y),
-            u: parseNumber(dict.u),
-            v: parseNumber(dict.v),
-          },
+          ssim: extract(dict),
         };
       });
 
+    const summary = (() => {
+      const ssim = {} as SSIMStat;
+
+      for (const frame of frames) {
+        for (const k of Object.keys(frame.ssim)) {
+          const key = k as SSIMStatKey;
+          ssim[key] = (ssim[key] || 0) + frame.ssim[key]!;
+        }
+      }
+
+      return {
+        ssim: Object.keys(ssim).reduce((hash, k) => {
+          const key = k as SSIMStatKey;
+          hash[key] = ssim[key]! / frames.length;
+
+          return hash;
+        }, {} as SSIMStat),
+      };
+    })();
+
     return {
-      ssim: {
-        avg: frames.reduce((acc, frame) => acc + frame.ssim.avg, 0) / frames.length,
-        y: frames.reduce((acc, frame) => acc + frame.ssim.y, 0) / frames.length,
-        u: frames.reduce((acc, frame) => acc + frame.ssim.u, 0) / frames.length,
-        v: frames.reduce((acc, frame) => acc + frame.ssim.v, 0) / frames.length,
-      },
+      ssim: summary.ssim,
       frames,
     };
   }
@@ -158,18 +212,18 @@ export class Vuality {
 
     const filters: string[] = (() => {
       return options.scale ? [
-        `movie=${reference}, scale=${options.scale.width}:${options.scale.height} [exp]`,
-        `[0:v] scale=${options.scale.width}:${options.scale.height} [act]`,
-        `[exp][act]${type}=${outputPath} [out]`,
+        `[0:v] scale=${options.scale.width}:${options.scale.height} [i]`,
+        `[1:v] scale=${options.scale.width}:${options.scale.height} [r]`,
+        `[i][r] ${type}=${outputPath}`,
       ] : [
-        `movie=${reference} [exp]`,
-        `[exp][0:v]${type}=${outputPath} [out]`,
+        `[0:v][1:v] ${type}=${outputPath}`,
       ];
     })();
 
     await execa(this.ffmpegPath, [
       "-i", Buffer.isBuffer(input) ? "-" : input,
-      "-vf", filters.join(";"),
+      "-i", reference,
+      "-filter_complex", filters.join(";"),
       "-f", "null",
       "-",
     ], { input: Buffer.isBuffer(input) ? input : undefined });
@@ -188,18 +242,18 @@ export class Vuality {
 
     const filters: string[] = (() => {
       return options.scale ? [
-        `movie=${reference}, scale=${options.scale.width}:${options.scale.height} [exp]`,
-        `[0:v] scale=${options.scale.width}:${options.scale.height} [act]`,
-        `[exp][act]${type}=${outputPath} [out]`,
+        `[0:v] scale=${options.scale.width}:${options.scale.height} [i]`,
+        `[1:v] scale=${options.scale.width}:${options.scale.height} [r]`,
+        `[i][r] ${type}=${outputPath}`,
       ] : [
-        `movie=${reference} [exp]`,
-        `[exp][0:v]${type}=${outputPath} [out]`,
+        `[0:v][1:v] ${type}=${outputPath}`,
       ];
     })();
 
     execa.sync(this.ffmpegPath, [
       "-i", Buffer.isBuffer(input) ? "-" : input,
-      "-vf", filters.join(";"),
+      "-i", reference,
+      "-filter_complex", filters.join(";"),
       "-f", "null",
       "-",
     ], { input: Buffer.isBuffer(input) ? input : undefined });
