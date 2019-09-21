@@ -50,23 +50,27 @@ Returns PSNR Stats
 If `scale` option is provided, Vuality tries to scale video streams as given resolution before computing PSNR.
 
 ```typescript
-interface Stat {
-  avg: number;
-  y: number;
-  u: number;
-  v: number;
+export interface PSNRStat {
+  avg?: number;
+  y?: number;
+  u?: number;
+  v?: number;
+  r?: number;
+  g?: number;
+  b?: number;
+  a?: number;
 }
 
-interface PSNRFrameStat {
+export interface PSNRFrame {
   n: number;
-  mse: Stat;
-  psnr: Stat;
+  mse: PSNRStat;
+  psnr: PSNRStat;
 }
 
-interface PSNRStat {
-  psnr: Stat;
-  mse: Stat;
-  frames: PSNRFrameStat[];
+export interface PSNR {
+  psnr: PSNRStat;
+  mse: PSNRStat;
+  frames: PSNRFrame[];
 }
 ```
 
@@ -82,21 +86,24 @@ Returns SSIM Stats
 If `scale` option is provided, Vuality tries to scale video streams as given resolution before computing SSIM.
 
 ```typescript
-interface Stat {
-  avg: number;
-  y: number;
-  u: number;
-  v: number;
-}
-
-export interface SSIMFrameStat {
-  n: number;
-  ssim: Stat;
-}
-
 export interface SSIMStat {
-  ssim: Stat;
-  frames: SSIMFrameStat[];
+  all?: number;
+  y?: number;
+  u?: number;
+  v?: number;
+  r?: number;
+  g?: number;
+  b?: number;
+}
+
+export interface SSIMFrame {
+  n: number;
+  ssim: SSIMStat;
+}
+
+export interface SSIM {
+  ssim: SSIMStat;
+  frames: SSIMFrame[];
 }
 ```
 
