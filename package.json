@@ -47,7 +47,7 @@
     "typescript": "3.7.3"
   },
   "dependencies": {
-    "execa": "^2.0.4",
+    "execa": "^3.0.0",
     "tempy": "^0.3.0"
   },
   "config": {
