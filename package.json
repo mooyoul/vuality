@@ -35,13 +35,13 @@
   "homepage": "https://github.com/mooyoul/vuality#readme",
   "devDependencies": {
     "@types/chai": "4.2.10",
-    "@types/mocha": "5.2.7",
+    "@types/mocha": "7.0.2",
     "@types/node": "8.10.59",
     "@vingle/commitlint-preset": "1.0.3",
     "@vingle/semantic-release-config": "1.0.5",
     "chai": "4.2.0",
     "husky": "4.2.3",
-    "mocha": "6.2.2",
+    "mocha": "7.1.0",
     "ts-node": "8.6.2",
     "tslint": "5.20.1",
     "typescript": "3.8.3"
