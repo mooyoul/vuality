@@ -41,7 +41,7 @@
     "@vingle/semantic-release-config": "1.0.5",
     "chai": "4.2.0",
     "husky": "4.2.5",
-    "mocha": "7.1.1",
+    "mocha": "7.1.2",
     "ts-node": "8.9.1",
     "tslint": "5.20.1",
     "typescript": "3.8.3"
