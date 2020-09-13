@@ -1,3 +1,10 @@
+## [1.1.7](https://github.com/mooyoul/vuality/compare/v1.1.6...v1.1.7) (2020-09-13)
+
+
+### Bug Fixes
+
+* **deps:** update dependency tempy to ^0.7.0 ([3df0b84](https://github.com/mooyoul/vuality/commit/3df0b84e0ee9f4e96be1a51fb01ec20c11665c2c))
+
 ## [1.1.6](https://github.com/mooyoul/vuality/compare/v1.1.5...v1.1.6) (2020-07-18)
 
 
