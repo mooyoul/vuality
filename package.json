@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "execa": "^4.0.0",
-    "tempy": "^0.7.0"
+    "tempy": "^1.0.0"
   },
   "config": {
     "commitizen": {
