@@ -34,7 +34,7 @@
   },
   "homepage": "https://github.com/mooyoul/vuality#readme",
   "devDependencies": {
-    "@types/chai": "4.2.21",
+    "@types/chai": "4.2.22",
     "@types/mocha": "7.0.2",
     "@types/node": "8.10.66",
     "@vingle/commitlint-preset": "1.0.3",
