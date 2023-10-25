@@ -10,7 +10,7 @@ jobs:
         run: |
           apt-get update
           apt-get install -y ffmpeg
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
       - name: Prepare
         run: npm ci
       - name: Lint
